@@ -15,7 +15,7 @@ function App() {
   const [health, setHealth] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/health")
+    fetch("http://backend:5000/health")
       .then((res) => res.json())
       .then((data) => setHealth(data))
       .catch((err) => console.error(err));
