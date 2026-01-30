@@ -27,6 +27,7 @@ jobs:
       - name: Run backend build check
         working-directory: app/backend
         run: node index.js &
+
   frontend-ci:
     name: Frontend CI
     runs-on: ubuntu-latest
@@ -47,8 +48,9 @@ jobs:
       - name: Build frontend
         working-directory: app/frontend
         run: npm run build
+
   docker-backend-build:
-    name: Docker Build Backend
+    name: Docker Build & Push Backend
     runs-on: ubuntu-latest
     needs: backend-ci
 
@@ -56,11 +58,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build backend Docker image
         run: |
-          docker build -t autoscaleops-backend ./app/backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/autoscaleops-backend:latest ./app/backend
+
+      - name: Push backend Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/autoscaleops-backend:latest
+
   docker-frontend-build:
-    name: Docker Build Frontend
+    name: Docker Build & Push Frontend
     runs-on: ubuntu-latest
     needs: frontend-ci
 
@@ -68,8 +81,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build frontend Docker image
         run: |
-          docker build -t autoscaleops-frontend ./app/frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/autoscaleops-frontend:latest ./app/frontend
 
+      - name: Push frontend Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/autoscaleops-frontend:latest
 
