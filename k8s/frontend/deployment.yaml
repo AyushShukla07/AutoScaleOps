@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autoscaleops-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: autoscaleops-frontend
+  template:
+    metadata:
+      labels:
+        app: autoscaleops-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ayushshukla07/autoscaleops-frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: VITE_BACKEND_URL
+              value: "http://autoscaleops-backend-service:5000"
